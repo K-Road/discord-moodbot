@@ -30,15 +30,15 @@ jobs:
       
       - name: Build and Push Docker image
         run: |
-          IMAGE=gcr.io/${{secrets.GCP_PROJECT_ID}}/moodbot
+          IMAGE=australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/moodbot-repo/moodbot
           docker build -t $IMAGE .
           docker push $IMAGE
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy moodbot \
-            --image gcr.io/${{secrets.GCP_PROJECT_ID}}/moodbot \
-            --region ${{secrets.GCP_REGION}} \
+            --image australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/moodbot-repo/moodbot \
+            --region australia-southeast2 \
             --platform managed \
             --allow-unauthenticated \
-            --set-env-vars DISCORD_BOT_TOKEN=${{secrets.DISCORD_BOT_TOKEN}}
+            --set-env-vars DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
