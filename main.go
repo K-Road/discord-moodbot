@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 
@@ -50,7 +51,14 @@ func main() {
 	}
 	defer dg.Close()
 
-	fmt.Println("MoodBot is running. Press CTRL-C to exit.")
+	go func() {
+		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+			w.Write([]byte("Hello from discord bot!"))
+		})
+		log.Fatal(http.ListenAndServe(":8080", nil))
+	}()
+
+	//fmt.Println("MoodBot is running. Press CTRL-C to exit.")
 	select {}
 }
 
