@@ -56,12 +56,10 @@ func main() {
 
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot {
-		fmt.Println("HERE")
 		return
 	}
 
 	if m.ChannelID != allowedChannelID {
-		fmt.Println("Reply to self")
 		return
 	}
 

@@ -1,0 +1,41 @@
+name: Deploy to cloud run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout soruce
+        uses: actions/checkout@v3
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID}}
+          service_account_key: ${{secrets.GCP_SA_KEY}}
+          export_default_credentials: true
+
+      - name: Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker
+      
+      - name: Build and Push Docker image
+        run: |
+          IMAGE=gcr.io/${{secrets.GCP_PROJECT_ID}}/moodbot
+          docker build -t $IMAGE .
+          docker push $IMAGE
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy moodbot \
+            --image gcr.io/${{secrets.GCP_PROJECT_ID}}/moodbot \
+            --region ${{secrets.GCP_REGION}} \
+            --platform managed
+            --allow-unauthenticated \
+            --set-env-vars DISCORD_BOT_TOKEN=${{secrets.DISCORD_BOT_TOKEN}}
