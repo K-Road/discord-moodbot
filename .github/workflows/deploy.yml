@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout soruce
+      - name: Checkout source
         uses: actions/checkout@v3
 
       - name: Set up Google Cloud SDK
@@ -36,6 +36,6 @@ jobs:
           gcloud run deploy moodbot \
             --image gcr.io/${{secrets.GCP_PROJECT_ID}}/moodbot \
             --region ${{secrets.GCP_REGION}} \
-            --platform managed
+            --platform managed \
             --allow-unauthenticated \
             --set-env-vars DISCORD_BOT_TOKEN=${{secrets.DISCORD_BOT_TOKEN}}
