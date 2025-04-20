@@ -31,6 +31,11 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080" // fallback for local testing
+	}
+
 	//Get token
 	token := os.Getenv("DISCORD_BOT_TOKEN")
 	if token == "" {
