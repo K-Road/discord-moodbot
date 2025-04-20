@@ -60,7 +60,7 @@ func main() {
 		http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Hello from discord bot!"))
 		})
-		log.Fatal(http.ListenAndServe(":8080", nil))
+		log.Fatal(http.ListenAndServe(":"+port, nil))
 	}()
 
 	//fmt.Println("MoodBot is running. Press CTRL-C to exit.")
