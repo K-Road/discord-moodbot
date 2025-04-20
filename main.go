@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
-	"github.com/joho/godotenv"
 )
 
 var moodMap = map[string]string{
@@ -26,10 +25,10 @@ const allowedChannelID = "1363353564109471935"
 
 func main() {
 	//Load .env
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	// err := godotenv.Load()
+	// if err != nil {
+	// 	log.Fatal("Error loading .env file")
+	// }
 
 	port := os.Getenv("PORT")
 	if port == "" {
