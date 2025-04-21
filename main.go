@@ -46,6 +46,20 @@ func main() {
 		fmt.Println("Error creating Discord sessions:", err)
 		return
 	}
+	dg.ShouldReconnectOnError = true
+
+	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
+		log.Print("✅ Bot is ready and connected to Discord.")
+	})
+	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Disconnect) {
+		log.Print("⚠️ Bot got disconnected from Discord!")
+	})
+	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Connect) {
+		log.Print("🔄 Bot reconnected to Discord.")
+	})
+	dg.AddHandler(func(s *discordgo.Session, evt *discordgo.Resumed) {
+		log.Printf("🔁 Bot resumed session with Discord. Trace: %v", evt.Trace)
+	})
 
 	dg.AddHandler(messageHandler)
 	err = dg.Open()
