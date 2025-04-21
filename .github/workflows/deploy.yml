@@ -53,7 +53,7 @@ jobs:
           # Build the bot
           go build -o moodbot
 
-          sudo tee /etc/systemd/system/moodbot.service > /dev/null << EOL
+          sudo bash -c 'cat > /etc/systemd/system/moodbot.service' << 'EOL'
 [Unit]
 Description=MoodBot Discord Bot
 After=network.target
