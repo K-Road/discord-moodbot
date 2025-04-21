@@ -53,23 +53,6 @@ jobs:
             # Build the bot
             go build -o moodbot
 
-            # Write the systemd service file using echo
-            sudo bash -c 'echo "[Unit]
-Description=MoodBot Discord Bot
-After=network.target
-
-[Service]
-ExecStart=/home/${{ secrets.GCE_USERNAME }}/moodbot/moodbot
-WorkingDirectory=/home/${{ secrets.GCE_USERNAME }}/moodbot
-Restart=always
-Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
-Environment=PORT=8080
-
-[Install]
-WantedBy=multi-user.target" > /etc/systemd/system/moodbot.service'
-
-            # Reload systemd and restart the bot
-            sudo systemctl daemon-reload
-            sudo systemctl enable moodbot
-            sudo systemctl restart moodbot
+            # Run the bot with the token as an environment variable
+            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }} ./moodbot
           EOF
