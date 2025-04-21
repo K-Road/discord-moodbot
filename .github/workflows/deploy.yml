@@ -21,9 +21,12 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.GCE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to Cloud Run
+      - name: Deploy to GCE
+        env:
+          GCE_HOST: ${{ secrets.GCE_HOST }}
+          GCE_USERNAME: ${{ secrets.GCE_USERNAME }}
         run: |
-          ssh ${{ secrets.GCE_USERNAME }}@{{ secrets.GCE_HOST }} << 'EOF'
+          ssh "$GCE_USERNAME@$GCE_HOST" << 'EOF'
             cd moodbot
             git pull origin main
             go build -o moodbot
