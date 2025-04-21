@@ -40,21 +40,21 @@ jobs:
         run: |
           ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
           set -e
-          
-            # Check if moodbot directory exists, if not, clone it
-            if [ ! -d "moodbot" ]; then
-              git clone https://github.com/K-Road/discord-moodbot.git moodbot
-            fi
-            cd moodbot
 
-            # Pull latest changes
-            git pull origin main
+          # Check if moodbot directory exists, if not, clone it
+          if [ ! -d "moodbot" ]; then
+            git clone https://github.com/K-Road/discord-moodbot.git moodbot
+          fi
+          cd moodbot
 
-            # Build the bot
-            go build -o moodbot
+          # Pull latest changes
+          git pull origin main
 
-            # Write or update the systemd service
-            echo "[Unit]
+          # Build the bot
+          go build -o moodbot
+
+          sudo tee /etc/systemd/system/moodbot.service > /dev/null << EOL
+[Unit]
 Description=MoodBot Discord Bot
 After=network.target
 
@@ -66,10 +66,10 @@ Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
 Environment=PORT=8080
 
 [Install]
-WantedBy=multi-user.target" | sudo tee /etc/systemd/system/moodbot.service
+WantedBy=multi-user.target
+EOL
 
-      # Reload systemd and restart the bot
-      sudo systemctl daemon-reload
-      sudo systemctl enable moodbot
-      sudo systemctl restart moodbot
-    EOF
+            sudo systemctl daemon-reload
+            sudo systemctl enable moodbot
+            sudo systemctl restart moodbot
+          EOF
