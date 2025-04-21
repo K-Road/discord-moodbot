@@ -21,14 +21,29 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.GCE_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy to GCE
-        env:
-          GCE_HOST: ${{ secrets.GCE_HOST }}
-          GCE_USERNAME: ${{ secrets.GCE_USERNAME }}
+      - name: Install Git on GCE VM
         run: |
-          ssh "$GCE_USERNAME@$GCE_HOST" << 'EOF'
+          ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
+            # Update package list and install Git
+            sudo apt-get update
+            sudo apt-get install -y git
+          EOF
+
+      - name: Deploy to GCE
+        run: |
+          ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
+            # Check if moodbot directory exists, if not, clone it
+            if [ ! -d "moodbot" ]; then
+              git clone https://github.com/K-Road/discord-moodbot.git moodbot
+            fi
             cd moodbot
+
+            # Pull latest changes
             git pull origin main
+
+            # Build the bot
             go build -o moodbot
+
+            # Restart the service
             sudo systemctl restart moodbot
           EOF
