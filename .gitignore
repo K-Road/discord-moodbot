@@ -23,3 +23,7 @@ go.work.sum
 
 # env file
 .env
+
+# Ignore GCE deploy keys
+moodbot_gce_key
+moodbot_gce_key.pub

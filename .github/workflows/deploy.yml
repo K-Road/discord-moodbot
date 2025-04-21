@@ -1,4 +1,4 @@
-name: Deploy to cloud run
+name: Deploy to GCE
 
 on:
   push:
@@ -11,33 +11,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: '${{secrets.GCP_SA_KEY}}'
-
-      - name: Set up Google Cloud SDK
-        uses: google-github-actions/setup-gcloud@v1
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID}}
-
-      - name: Configure Docker for Artifact Registry
-        run: gcloud auth configure-docker australia-southeast2-docker.pkg.dev
-      
-      - name: Build and Push Docker image
+      - name: Set up SSH
         run: |
-          IMAGE=australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/moodbot-repo/moodbot
-          docker build -t $IMAGE .
-          docker push $IMAGE
+          mkdir -p ~/.ssh
+          echo "${{ secrets.GCE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.GCE_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy moodbot \
-            --image australia-southeast2-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/moodbot-repo/moodbot \
-            --region australia-southeast2 \
-            --platform managed \
-            --allow-unauthenticated \
-            --set-env-vars DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+          ssh ${{ secrets.GCE_USERNAME }}@{{ secrets.GCE_HOST }} << 'EOF'
+            cd moodbot
+            git pull origin main
+            go build -o moodbot
+            sudo systemctl restart moodbot
+          EOF
