@@ -39,21 +39,21 @@ jobs:
       - name: Deploy to GCE
         run: |
           ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
-          set -e
+            set -e
 
-          # Check if moodbot directory exists, if not, clone it
-          if [ ! -d "moodbot" ]; then
-            git clone https://github.com/K-Road/discord-moodbot.git moodbot
-          fi
-          cd moodbot
+            # Check if moodbot directory exists, if not, clone it
+            if [ ! -d "moodbot" ]; then
+              git clone https://github.com/K-Road/discord-moodbot.git moodbot
+            fi
+            cd moodbot
 
-          # Pull latest changes
-          git pull origin main
+            # Pull latest changes
+            git pull origin main
 
-          # Build the bot
-          go build -o moodbot
+            # Build the bot
+            go build -o moodbot
 
-          sudo bash -c 'cat > /etc/systemd/system/moodbot.service' << 'EOL'
+            sudo bash -c 'cat > /etc/systemd/system/moodbot.service << "EOL"
 [Unit]
 Description=MoodBot Discord Bot
 After=network.target
@@ -67,7 +67,7 @@ Environment=PORT=8080
 
 [Install]
 WantedBy=multi-user.target
-EOL
+EOL'
 
             sudo systemctl daemon-reload
             sudo systemctl enable moodbot
