@@ -57,7 +57,7 @@ jobs:
             pkill -f ./moodbot || true
 
             # Create systemd service file with real token
-            sudo bash -c 'cat > /etc/systemd/system/moodbot.service <<EOL
+            sudo bash -c 'cat > /etc/systemd/system/moodbot.service << "EOL"
 [Unit]
 Description=MoodBot Discord Bot
 After=network.target
