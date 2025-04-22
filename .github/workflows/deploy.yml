@@ -72,11 +72,11 @@ jobs:
             [Install]
             WantedBy=multi-user.target" > /home/chrisgoode1982/moodbot/moodbot.service.debug
 
-                  # Inspect the file on the remote server
-                  cat /home/chrisgoode1982/moodbot/moodbot.service.debug
+            # Inspect the file on the remote server
+            cat /home/chrisgoode1982/moodbot/moodbot.service.debug
 
-                  # Write the service file to the systemd directory only if the debug looks good
-                  sudo bash -c 'cat > /etc/systemd/system/moodbot.service <<EOL
+            # Write the service file to the systemd directory only if the debug looks good
+            sudo bash -c 'cat > /etc/systemd/system/moodbot.service <<EOL
             [Unit]
             Description=MoodBot Discord Bot
             After=network.target
@@ -91,8 +91,8 @@ jobs:
             WantedBy=multi-user.target
             EOL'
 
-                  # Reload systemd, enable and start the bot service
-                  sudo systemctl daemon-reload
-                  sudo systemctl enable moodbot
-                  sudo systemctl restart moodbot
+            # Reload systemd, enable and start the bot service
+            sudo systemctl daemon-reload
+            sudo systemctl enable moodbot
+            sudo systemctl restart moodbot
             EOF
