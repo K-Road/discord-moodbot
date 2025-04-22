@@ -41,6 +41,8 @@ jobs:
           ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
             set -e
 
+            export DISCORD_BOT_TOKEN="${{ secrets.DISCORD_BOT_TOKEN }}"
+
             # Check if moodbot directory exists, if not, clone it
             if [ ! -d "moodbot" ]; then
               git clone https://github.com/K-Road/discord-moodbot.git moodbot
@@ -57,7 +59,7 @@ jobs:
             pkill -f ./moodbot || true
 
             # Create systemd service file with real token
-            sudo tee /etc/systemd/system/moodbot.service > /dev/null <<EOL
+            sudo tee /etc/systemd/system/moodbot.service > /dev/null <<'EOL'
 [Unit]
 Description=MoodBot Discord Bot
 After=network.target
