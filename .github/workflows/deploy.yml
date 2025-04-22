@@ -53,6 +53,27 @@ jobs:
             # Build the bot
             go build -o moodbot
 
-            # Run the bot with the token as an environment variable
-            DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }} ./moodbot
+            # Kill any previous instance
+            pkill -f ./moodbot || true
+
+            # Create systemd service file with real token
+            sudo bash -c 'cat > /etc/systemd/system/moodbot.service <<EOL
+[Unit]
+Description=MoodBot Discord Bot
+After=network.target
+
+[Service]
+ExecStart=/home/chrisgoode1982/moodbot/moodbot
+WorkingDirectory=/home/chrisgoode1982/moodbot
+Restart=always
+Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+
+[Install]
+WantedBy=multi-user.target
+EOL'
+
+            # Reload systemd and restart the bot
+            sudo systemctl daemon-reload
+            sudo systemctl enable moodbot
+            sudo systemctl restart moodbot
           EOF
