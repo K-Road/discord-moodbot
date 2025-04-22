@@ -57,7 +57,7 @@ jobs:
             pkill -f ./moodbot || true
 
             # Create systemd service file with real token
-            sudo bash -c 'cat > /etc/systemd/system/moodbot.service << "EOL"
+            sudo bash -c "cat > /etc/systemd/system/moodbot.service << EOL
 [Unit]
 Description=MoodBot Discord Bot
 After=network.target
@@ -70,7 +70,7 @@ Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
 
 [Install]
 WantedBy=multi-user.target
-EOL'
+EOL"
 
             # Reload systemd and restart the bot
             sudo systemctl daemon-reload
