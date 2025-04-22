@@ -95,4 +95,4 @@ jobs:
             sudo systemctl daemon-reload
             sudo systemctl enable moodbot
             sudo systemctl restart moodbot
-            EOF
+          EOF
