@@ -58,8 +58,25 @@ jobs:
             # Kill any previous instance
             pkill -f ./moodbot || true
 
-            # Create systemd service file with real token
-            sudo tee /etc/systemd/system/moodbot.service > /dev/null <<'EOL'
+            # Debug: Echoing systemd service contents to ensure the file is generated correctly
+            echo "[Unit]
+Description=MoodBot Discord Bot
+After=network.target
+
+[Service]
+ExecStart=/home/chrisgoode1982/moodbot/moodbot
+WorkingDirectory=/home/chrisgoode1982/moodbot
+Restart=always
+Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
+
+[Install]
+WantedBy=multi-user.target" > /home/chrisgoode1982/moodbot/moodbot.service.debug
+
+      # Inspect the file on the remote server
+      cat /home/chrisgoode1982/moodbot/moodbot.service.debug
+
+      # Write the service file to the systemd directory only if the debug looks good
+      sudo bash -c 'cat > /etc/systemd/system/moodbot.service <<EOL
 [Unit]
 Description=MoodBot Discord Bot
 After=network.target
@@ -68,14 +85,14 @@ After=network.target
 ExecStart=/home/chrisgoode1982/moodbot/moodbot
 WorkingDirectory=/home/chrisgoode1982/moodbot
 Restart=always
-Environment=DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
 
 [Install]
 WantedBy=multi-user.target
-EOL
+EOL'
 
-            # Reload systemd and restart the bot
-            sudo systemctl daemon-reload
-            sudo systemctl enable moodbot
-            sudo systemctl restart moodbot
-          EOF
+      # Reload systemd, enable and start the bot service
+      sudo systemctl daemon-reload
+      sudo systemctl enable moodbot
+      sudo systemctl restart moodbot
+EOF
