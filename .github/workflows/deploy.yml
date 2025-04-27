@@ -56,16 +56,16 @@ jobs:
             After=network.target
 
             [Service]
-            ExecStart=/home/chrisgoode1982/moodbot/moodbot
-            WorkingDirectory=/home/chrisgoode1982/moodbot
+            ExecStart=/home/github-actions/moodbot/moodbot
+            WorkingDirectory=/home/github-actions/moodbot
             Restart=always
             Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
 
             [Install]
-            WantedBy=multi-user.target" > /home/chrisgoode1982/moodbot/moodbot.service.debug
+            WantedBy=multi-user.target" > /home/github-actions/moodbot/moodbot.service.debug
 
             # Inspect the file on the remote server
-            cat /home/chrisgoode1982/moodbot/moodbot.service.debug
+            cat /home/github-actions/moodbot/moodbot.service.debug
 
             # Write the service file to the systemd directory only if the debug looks good
             sudo bash -c 'cat > /etc/systemd/system/moodbot.service <<EOL
