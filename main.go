@@ -65,6 +65,7 @@ func main() {
 	dg.AddHandler(messageHandler)
 
 	dg.AddHandler(commandHandler)
+	dg.AddHandler(weatherHandler)
 
 	//Open discord Session
 	err = dg.Open()
