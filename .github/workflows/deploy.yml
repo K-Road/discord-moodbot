@@ -74,8 +74,8 @@ jobs:
             After=network.target
 
             [Service]
-            ExecStart=/home/chrisgoode1982/moodbot/moodbot
-            WorkingDirectory=/home/chrisgoode1982/moodbot
+            ExecStart=/home/github-actions/moodbot/moodbot
+            WorkingDirectory=/home/github-actions/moodbot
             Restart=always
             Environment=DISCORD_BOT_TOKEN=${{ secrets.DISCORD_BOT_TOKEN }}
 
