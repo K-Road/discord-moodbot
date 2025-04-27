@@ -23,6 +23,8 @@ var moodMap = map[string]string{
 
 const allowedChannelID = "1363353564109471935"
 
+var botEnabled = true
+
 func main() {
 	//Load .env
 	// err := godotenv.Load()
@@ -62,6 +64,15 @@ func main() {
 	})
 
 	dg.AddHandler(messageHandler)
+
+	//Command handlers
+
+	dg.AddHandler(commandHandler)
+	if err := registerCommands(dg); err != nil {
+		log.Fatalf("Failed to register commands: %v", err)
+	}
+
+	//Open discord Session
 	err = dg.Open()
 	if err != nil {
 		fmt.Println("Error opening connection:", err)
@@ -82,6 +93,9 @@ func main() {
 
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot {
+		return
+	}
+	if !botEnabled {
 		return
 	}
 

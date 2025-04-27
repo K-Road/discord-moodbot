@@ -20,14 +20,6 @@ jobs:
           echo "${{ secrets.GCE_SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.GCE_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Install Git on GCE VM
-        run: |
-          ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
-            # Update package list and install Git
-            sudo apt-get update
-            sudo apt-get install -y git
-          EOF
       
       - name: Install Git and Go on GCE VM
         run: |
