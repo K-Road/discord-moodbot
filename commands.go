@@ -52,11 +52,11 @@ func registerCommands(dg *discordgo.Session) error {
 	}
 
 	for _, cmd := range commands {
-		log.Printf("registering: %s", cmd.Name)
 		_, err := dg.ApplicationCommandCreate(dg.State.User.ID, "", cmd)
 		if err != nil {
 			return fmt.Errorf("cannot create '%v' command: %w", cmd.Name, err)
 		}
+		log.Printf("registered: %s", cmd.Name)
 	}
 
 	return nil
