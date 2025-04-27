@@ -43,7 +43,7 @@ func registerCommands(dg *discordgo.Session) error {
 		},
 		{
 			Name:        "disable",
-			Description: "Disable the bot",
+			Description: "Disable the bot test",
 		},
 		{
 			Name:        "moodweather",
