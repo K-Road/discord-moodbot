@@ -45,8 +45,7 @@ func main() {
 
 	dg, err := discordgo.New("Bot " + token)
 	if err != nil {
-		fmt.Println("Error creating Discord sessions:", err)
-		return
+		log.Fatalf("Error creating Discord sessions: %v", err)
 	}
 	dg.ShouldReconnectOnError = true
 
@@ -65,12 +64,7 @@ func main() {
 
 	dg.AddHandler(messageHandler)
 
-	//Command handlers
-
 	dg.AddHandler(commandHandler)
-	if err := registerCommands(dg); err != nil {
-		log.Fatalf("Failed to register commands: %v", err)
-	}
 
 	//Open discord Session
 	err = dg.Open()
@@ -78,6 +72,11 @@ func main() {
 		fmt.Println("Error opening connection:", err)
 		return
 	}
+
+	if err := registerCommands(dg); err != nil {
+		log.Fatalf("Failed to register commands: %v", err)
+	}
+
 	defer dg.Close()
 
 	go func() {
