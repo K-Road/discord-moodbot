@@ -50,10 +50,10 @@ func registerCommands(dg *discordgo.Session) error {
 			Name:        "disable",
 			Description: "Disable the bot test",
 		},
-		// {
-		// 	Name:        "moodweather",
-		// 	Description: "Suggest a mood based on the current weather",
-		// },
+		{
+			Name:        "moodweather",
+			Description: "Suggest a mood based on the current weather",
+		},
 	}
 
 	for _, cmd := range commands {
