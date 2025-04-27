@@ -23,14 +23,14 @@ jobs:
       
       - name: Install Git and Go on GCE VM
         run: |
-          ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
+          ssh -T ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
             sudo apt-get update
             sudo apt-get install -y git golang-go
           EOF
 
       - name: Deploy to GCE
         run: |
-          ssh ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
+          ssh -T ${{ secrets.GCE_USERNAME }}@${{ secrets.GCE_HOST }} << 'EOF'
             set -e
 
             export DISCORD_BOT_TOKEN="${{ secrets.DISCORD_BOT_TOKEN }}"
