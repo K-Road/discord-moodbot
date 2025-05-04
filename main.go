@@ -23,6 +23,10 @@ var moodMap = map[string]string{
 
 const allowedChannelID = "1363353564109471935"
 
+var allowedChannels = map[string]bool{
+	allowedChannelID: true,
+}
+
 var botEnabled = true
 
 func main() {
@@ -99,7 +103,7 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if m.ChannelID != allowedChannelID {
+	if !allowedChannels[m.ChannelID] {
 		return
 	}
 

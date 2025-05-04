@@ -82,6 +82,18 @@ func getWeather() (*WeatherData, error) {
 }
 
 func handleMoodWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	// check if enabled
+	// if !botEnabled {
+	// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
+	// 		Data: &discordgo.InteractionResponseData{
+	// 			Content: "🚫 Bot is currently disabled.",
+	// 			Flags:   discordgo.MessageFlagsEphemeral,
+	// 		},
+	// 	})
+	// 	return
+	// }
+
 	// Step 1: Get weather
 	weatherData, err := getWeather()
 	if err != nil {
@@ -111,6 +123,28 @@ func handleMoodWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCrea
 }
 
 func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	if !botEnabled {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "🚫 Bot is currently disabled.",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
+		return
+	}
+
+	if !allowedChannels[i.ChannelID] {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "⛔ You can't use this command in this channel.",
+				Flags:   discordgo.MessageFlagsEphemeral,
+			},
+		})
+		return
+	}
+
 	if i.Type == discordgo.InteractionApplicationCommand {
 		switch i.ApplicationCommandData().Name {
 		case "moodweather":
