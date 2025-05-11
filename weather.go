@@ -154,6 +154,14 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 		},
 	})
 	go func() {
+
+		_, err := s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+			Content: "✅ Follow-up works!",
+		})
+		if err != nil {
+			log.Println("FollowupMessageCreate failed:", err)
+		}
+
 		weatherData, err := getWeather()
 		if err != nil {
 			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
@@ -167,12 +175,15 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
 				Content: "Unknown",
 			})
+			return
 		}
+
 		aireply, err := generateMoodFromWeather(weatherDescription)
 		if err != nil {
 			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
 				Content: "Unknown",
 			})
+			return
 		}
 
 		s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
