@@ -61,7 +61,7 @@ func registerCommands(dg *discordgo.Session) error {
 		{
 			Name:        "moodbot",
 			Description: "Control Moodbot functionalities",
-			Type:        discordgo.ApplicationCommandType(discordgo.ApplicationCommandOptionSubCommandGroup),
+			//Type:        discordgo.ApplicationCommandType(discordgo.ApplicationCommandOptionSubCommandGroup),
 			Options: []*discordgo.ApplicationCommandOption{
 				{
 					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
