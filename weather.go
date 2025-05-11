@@ -146,42 +146,48 @@ func handleMoodWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCrea
 }
 
 func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	weatherData, err := getWeather()
-	if err != nil {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "❌ Failed to fetch weather data!",
-			},
-		})
-		return
-	}
-	weatherCode := int(weatherData.Current.WeatherCode)
-	weatherDescription, ok := weatherCodeDescriptions[weatherCode]
-	if !ok {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "Unknown",
-			},
-		})
-	}
-	aireply, err := generateMoodFromWeather(weatherDescription)
-	if err != nil {
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "Unknown",
-			},
-		})
-	}
-
+	// Immediate response
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: aireply,
+			Content: "🤖 Thinking about your weather mood...",
 		},
 	})
+	go func() {
+		weatherData, err := getWeather()
+		if err != nil {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "❌ Failed to fetch weather data!",
+				},
+			})
+			return
+		}
+		weatherCode := int(weatherData.Current.WeatherCode)
+		weatherDescription, ok := weatherCodeDescriptions[weatherCode]
+		if !ok {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Unknown",
+				},
+			})
+		}
+		aireply, err := generateMoodFromWeather(weatherDescription)
+		if err != nil {
+			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+				Type: discordgo.InteractionResponseChannelMessageWithSource,
+				Data: &discordgo.InteractionResponseData{
+					Content: "Unknown",
+				},
+			})
+		}
+
+		s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+			Content: aireply,
+		})
+	}()
 }
 
 // ##TODO refactor into commandhandler
