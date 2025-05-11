@@ -147,7 +147,7 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 	if i.Type == discordgo.InteractionApplicationCommand {
 		switch i.ApplicationCommandData().Name {
-		case "moodweather":
+		case "weather":
 			fmt.Println("Executing moodweather command") // Debug log
 			handleMoodWeatherCommand(s, i)
 		}

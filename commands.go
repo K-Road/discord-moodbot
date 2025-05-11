@@ -11,27 +11,43 @@ func commandHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if i.Type != discordgo.InteractionApplicationCommand {
 		return
 	}
-
-	switch i.ApplicationCommandData().Name {
-	case "enable":
-		//enable bot
-		botEnabled = true
+	//##TODO add allowed channel
+	if !allowedChannels[i.ChannelID] {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
-				Content: "Bot enabled!",
+				Content: "⛔ You can't use this command in this channel.",
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
-	case "disable":
-		//disable bot
-		botEnabled = false
-		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-			Type: discordgo.InteractionResponseChannelMessageWithSource,
-			Data: &discordgo.InteractionResponseData{
-				Content: "Bot disabled!",
-			},
-		})
+		return
+	}
+	cmd := i.ApplicationCommandData()
+	switch cmd.Name {
+	case "moodbot":
+		if len(cmd.Options) > 0 {
+			switch cmd.Options[0].Name {
+			case "enable":
+				//enable bot
+				botEnabled = true
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "Bot enabled!",
+					},
+				})
+			case "disable":
+				//disable bot
+				botEnabled = false
+				s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+					Type: discordgo.InteractionResponseChannelMessageWithSource,
+					Data: &discordgo.InteractionResponseData{
+						Content: "Bot disabled!",
+					},
+				})
 
+			}
+		}
 	}
 }
 
@@ -43,16 +59,26 @@ func registerCommands(dg *discordgo.Session) error {
 
 	commands := []*discordgo.ApplicationCommand{
 		{
-			Name:        "enable",
-			Description: "Enable the bot",
-		},
-		{
-			Name:        "disable",
-			Description: "Disable the bot",
-		},
-		{
-			Name:        "moodweather",
-			Description: "Suggest a mood based on the current weather",
+			Name:        "moodbot",
+			Description: "Control Moodbot functionalities",
+			Type:        discordgo.ApplicationCommandType(discordgo.ApplicationCommandOptionSubCommandGroup),
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Name:        "enable",
+					Description: "Enable the bot",
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Name:        "disable",
+					Description: "Disable the bot",
+				},
+				{
+					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Name:        "weather",
+					Description: "Suggest a mood based on the current weather",
+				},
+			},
 		},
 	}
 
