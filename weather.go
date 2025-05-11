@@ -219,7 +219,7 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				//	switch i.ApplicationCommandData().Name {
 				//	case "weather":
 				fmt.Println("Executing moodweather command") // Debug log
-				handleMoodWeatherCommand(s, i)
+				//handleMoodWeatherCommand(s, i)
 				handleAIWeatherCommand(s, i)
 			}
 		}
