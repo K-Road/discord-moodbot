@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/sashabaranov/go-openai"
 )
 
 var weatherCodeToMood = map[int]string{
@@ -31,6 +35,37 @@ var weatherCodeToMood = map[int]string{
 	95: "⛈️ Thunderstorm — intense and passionate!",
 	96: "⛈️ Thunderstorm with hail — wild mood!",
 	99: "⛈️ Severe thunderstorm — electrifying energy!",
+}
+
+var weatherCodeDescriptions = map[int]string{
+	0:  "Clear sky",
+	1:  "Mainly clear",
+	2:  "Partly cloudy",
+	3:  "Overcast",
+	45: "Fog",
+	48: "Depositing rime fog",
+	51: "Light drizzle",
+	53: "Moderate drizzle",
+	55: "Dense drizzle",
+	56: "Light freezing drizzle",
+	57: "Dense freezing drizzle",
+	61: "Slight rain",
+	63: "Moderate rain",
+	65: "Heavy rain",
+	66: "Light freezing rain",
+	67: "Heavy freezing rain",
+	71: "Slight snowfall",
+	73: "Moderate snowfall",
+	75: "Heavy snowfall",
+	77: "Snow grains",
+	80: "Slight rain showers",
+	81: "Moderate rain showers",
+	82: "Violent rain showers",
+	85: "Slight snow showers",
+	86: "Heavy snow showers",
+	95: "Thunderstorm: Slight or moderate",
+	96: "Thunderstorm with slight hail",
+	99: "Thunderstorm with heavy hail",
 }
 
 type WeatherData struct {
@@ -82,18 +117,6 @@ func getWeather() (*WeatherData, error) {
 }
 
 func handleMoodWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
-	// check if enabled
-	// if !botEnabled {
-	// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-	// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
-	// 		Data: &discordgo.InteractionResponseData{
-	// 			Content: "🚫 Bot is currently disabled.",
-	// 			Flags:   discordgo.MessageFlagsEphemeral,
-	// 		},
-	// 	})
-	// 	return
-	// }
-
 	// Step 1: Get weather
 	weatherData, err := getWeather()
 	if err != nil {
@@ -118,6 +141,45 @@ func handleMoodWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCrea
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: mood,
+		},
+	})
+}
+
+func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate) {
+	weatherData, err := getWeather()
+	if err != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "❌ Failed to fetch weather data!",
+			},
+		})
+		return
+	}
+	weatherCode := int(weatherData.Current.WeatherCode)
+	weatherDescription, ok := weatherCodeDescriptions[weatherCode]
+	if !ok {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Unknown",
+			},
+		})
+	}
+	aireply, err := generateMoodFromWeather(weatherDescription)
+	if err != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Content: "Unknown",
+			},
+		})
+	}
+
+	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Content: aireply,
 		},
 	})
 }
@@ -158,7 +220,34 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 				//	case "weather":
 				fmt.Println("Executing moodweather command") // Debug log
 				handleMoodWeatherCommand(s, i)
+				handleAIWeatherCommand(s, i)
 			}
 		}
 	}
+}
+
+// ##TODO add role system as variable input.
+func generateMoodFromWeather(desc string) (string, error) {
+	key := os.Getenv("OPEN_API_KEY")
+	if key == "" {
+		log.Fatal("OPEN_API_KEY not found")
+	}
+	client := openai.NewClient(key)
+	resp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
+		Model: openai.GPT3Dot5Turbo,
+		Messages: []openai.ChatCompletionMessage{
+			{
+				Role:    "system",
+				Content: "You are a sarcastic assistant who gives short mood suggestions based on weather.",
+			},
+			{
+				Role:    "user",
+				Content: fmt.Sprintf("Weather: %s", desc),
+			},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+	return resp.Choices[0].Message.Content, nil
 }
