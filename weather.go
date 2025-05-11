@@ -155,39 +155,42 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 	})
 	go func() {
 
-		_, err := s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
-			Content: "✅ Follow-up works!",
+		msg, err := s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+			Content: "✅ Gathering weather data",
 		})
 		if err != nil {
 			log.Println("FollowupMessageCreate failed:", err)
+			return
 		}
 
+		//fetch weather
 		weatherData, err := getWeather()
 		if err != nil {
-			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
-				Content: "❌ Failed to fetch weather data!",
+			s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
+				Content: ptr("❌ Failed to fetch weather data!"),
 			})
 			return
 		}
+
 		weatherCode := int(weatherData.Current.WeatherCode)
 		weatherDescription, ok := weatherCodeDescriptions[weatherCode]
 		if !ok {
-			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
-				Content: "Unknown",
+			s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
+				Content: ptr("Unknown"),
 			})
 			return
 		}
 
 		aireply, err := generateMoodFromWeather(weatherDescription)
 		if err != nil {
-			s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
-				Content: "Unknown",
+			s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
+				Content: ptr("Unknown"),
 			})
 			return
 		}
 
-		s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
-			Content: aireply,
+		s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
+			Content: ptr(aireply),
 		})
 	}()
 }
@@ -258,4 +261,8 @@ func generateMoodFromWeather(desc string) (string, error) {
 		return "", err
 	}
 	return resp.Choices[0].Message.Content, nil
+}
+
+func ptr(s string) *string {
+	return &s
 }
