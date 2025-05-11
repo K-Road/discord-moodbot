@@ -122,6 +122,7 @@ func handleMoodWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCrea
 	})
 }
 
+// ##TODO refactor into commandhandler
 func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 	if !botEnabled {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -145,11 +146,19 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		return
 	}
 
-	if i.Type == discordgo.InteractionApplicationCommand {
-		switch i.ApplicationCommandData().Name {
-		case "weather":
-			fmt.Println("Executing moodweather command") // Debug log
-			handleMoodWeatherCommand(s, i)
+	cmd := i.ApplicationCommandData()
+	switch cmd.Name {
+	case "moodbot":
+		if len(cmd.Options) > 0 {
+			switch cmd.Options[0].Name {
+			case "weather":
+
+				//if i.Type == discordgo.InteractionApplicationCommand {
+				//	switch i.ApplicationCommandData().Name {
+				//	case "weather":
+				fmt.Println("Executing moodweather command") // Debug log
+				handleMoodWeatherCommand(s, i)
+			}
 		}
 	}
 }
