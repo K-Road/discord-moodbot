@@ -64,17 +64,17 @@ func registerCommands(dg *discordgo.Session) error {
 			//Type:        discordgo.ApplicationCommandType(discordgo.ApplicationCommandOptionSubCommandGroup),
 			Options: []*discordgo.ApplicationCommandOption{
 				{
-					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Name:        "enable",
 					Description: "Enable the bot",
 				},
 				{
-					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Name:        "disable",
 					Description: "Disable the bot",
 				},
 				{
-					Type:        discordgo.ApplicationCommandOptionSubCommandGroup,
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Name:        "weather",
 					Description: "Suggest a mood based on the current weather",
 				},
