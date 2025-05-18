@@ -243,7 +243,7 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func generateMoodFromWeather(desc string) (string, error) {
 	key := os.Getenv("OPENAI_API_KEY")
 	if key == "" {
-		return "Can't fetch mood, OpenAI key is missing. Blame the dev.", nil
+		return "", fmt.Errorf("Can't fetch mood, OpenAI key is missing. Blame the dev.")
 		//log.Fatal("OPENAI_API_KEY not found")
 	}
 	client := openai.NewClient(key)
