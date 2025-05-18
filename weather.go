@@ -173,6 +173,11 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 			log.Println("FollowupMessageCreate failed:", err)
 			return
 		}
+		if msg == nil {
+			log.Println("FollowupMessageCreate returned nil msg with no error!")
+			return
+		}
+		log.Printf("✅ FollowupMessage created with ID: %s", msg.ID)
 
 		//fetch weather
 		weatherData, err := getWeather()
