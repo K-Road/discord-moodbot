@@ -154,6 +154,16 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 		},
 	})
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Printf("🔥 Panic recovered in weather goroutine: %v\n", r)
+				//s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
+				//	Content: ptr("Something went wrong inside mood generator"),
+				//})
+			}
+		}()
+
+		//go func() {
 
 		msg, err := s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
 			Content: "✅ Gathering weather data",
@@ -195,6 +205,7 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 			Content: ptr(aireply),
 		})
 	}()
+
 }
 
 // ##TODO refactor into commandhandler
@@ -243,6 +254,7 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 func generateMoodFromWeather(desc string) (string, error) {
 	key := os.Getenv("OPENAI_API_KEY")
 	if key == "" {
+		log.Println("Missing OPENAI_API_KEY in environment")
 		return "", fmt.Errorf("Can't fetch mood, OpenAI key is missing. Blame the dev.")
 		//log.Fatal("OPENAI_API_KEY not found")
 	}
@@ -261,7 +273,13 @@ func generateMoodFromWeather(desc string) (string, error) {
 		},
 	})
 	if err != nil {
+		log.Println("❌ OpenAI API call failed: %v", err)
 		return "", err
+	}
+
+	if len(resp.Choices) == 0 {
+		log.Println("OpenAI returned no choices")
+		return "", fmt.Errorf("no choices return from OpenAI")
 	}
 	return resp.Choices[0].Message.Content, nil
 }
