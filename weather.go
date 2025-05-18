@@ -166,7 +166,7 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 		//go func() {
 		log.Println("Executing moodweather command")
 
-		msg, err := s.FollowupMessageCreate(i.Interaction, false, &discordgo.WebhookParams{
+		msg, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Content: "✅ Gathering weather data",
 		})
 		if err != nil {
