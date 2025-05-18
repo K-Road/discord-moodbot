@@ -241,9 +241,10 @@ func weatherHandler(s *discordgo.Session, i *discordgo.InteractionCreate) {
 
 // ##TODO add role system as variable input.
 func generateMoodFromWeather(desc string) (string, error) {
-	key := os.Getenv("OPEN_API_KEY")
+	key := os.Getenv("OPENAI_API_KEY")
 	if key == "" {
-		log.Fatal("OPEN_API_KEY not found")
+		return "Can't fetch mood, OpenAI key is missing. Blame the dev.", nil
+		//log.Fatal("OPENAI_API_KEY not found")
 	}
 	client := openai.NewClient(key)
 	resp, err := client.CreateChatCompletion(context.Background(), openai.ChatCompletionRequest{
