@@ -166,6 +166,7 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 		//fetch weather
 		weatherData, err := getWeather()
 		if err != nil {
+			log.Println("getWeather() failed:", err) //LOGGING
 			s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
 				Content: ptr("❌ Failed to fetch weather data!"),
 			})
@@ -183,6 +184,7 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 
 		aireply, err := generateMoodFromWeather(weatherDescription)
 		if err != nil {
+			log.Println("generatedMoodFromWeather() failed:", err) //LOGGING
 			s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
 				Content: ptr("Unknown"),
 			})
