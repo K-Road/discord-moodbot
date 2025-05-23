@@ -208,7 +208,7 @@ func handleAIWeatherCommand(s *discordgo.Session, i *discordgo.InteractionCreate
 		}
 
 		s.FollowupMessageEdit(i.Interaction, msg.ID, &discordgo.WebhookEdit{
-			Content: ptr(aireply),
+			Content: ptr(weatherDescription + " " + aireply),
 		})
 	}()
 
@@ -261,7 +261,7 @@ func generateMoodFromWeather(desc string) (string, error) {
 	key := os.Getenv("OPENAI_API_KEY")
 	if key == "" {
 		log.Println("Missing OPENAI_API_KEY in environment")
-		return "", fmt.Errorf("Can't fetch mood, OpenAI key is missing. Blame the dev.")
+		return "", fmt.Errorf("can't fetch mood, OpenAI key is missing. Blame the dev")
 		//log.Fatal("OPENAI_API_KEY not found")
 	}
 	client := openai.NewClient(key)
@@ -279,7 +279,7 @@ func generateMoodFromWeather(desc string) (string, error) {
 		},
 	})
 	if err != nil {
-		log.Println("❌ OpenAI API call failed: %v", err)
+		log.Printf("❌ OpenAI API call failed: %v", err)
 		return "", err
 	}
 
