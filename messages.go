@@ -61,7 +61,7 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//log.Fatal("OPENAI_API_KEY not found")
 	}
 
-	prompt := fmt.Sprintf(`What is the motion of this message? Respond with one word (e.g., happy, sad, angry, excited, confused, disappointed, etc). Message: %s"`, m.Content)
+	prompt := fmt.Sprintf(`What is the emotion of this message? Respond with one word (e.g., happy, sad, angry, excited, confused, disappointed, etc). Message: %s"`, m.Content)
 
 	resp, err := openai.NewClient(key).CreateChatCompletion(
 		context.Background(),
@@ -80,6 +80,8 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	emotion := strings.ToLower(strings.TrimSpace(resp.Choices[0].Message.Content))
 	emoji := emotionToEmoji(emotion)
+
+	log.Println("Detected emotion:", emotion)
 	if emoji == "" {
 		log.Println("Blank emoji")
 		return
@@ -93,20 +95,22 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 func emotionToEmoji(emotion string) string {
 	switch emotion {
-	case "angry":
+	case "angry", "mad", "annoyed", "furious":
 		return "😠"
-	case "happy", "joy":
+	case "happy", "joy", "joyful", "pleased", "delighted":
 		return "😄"
-	case "sad":
+	case "sad", "unhappy", "down", "depressed":
 		return "😢"
-	case "confused":
+	case "confused", "unsure":
 		return "😕"
-	case "excited":
+	case "excited", "thrilled":
 		return "🤩"
-	case "annoyed":
-		return "😒"
-	case "frustrated":
+	case "frustrated", "grumpy":
 		return "💥"
+	case "love", "loving":
+		return "❤️"
+	case "neutral", "okay", "fine":
+		return "😐"
 	default:
 		return ""
 	}
