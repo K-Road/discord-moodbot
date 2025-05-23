@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strings"
 
@@ -48,9 +47,9 @@ func analyzeIntentHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	if rand.Intn(5) != 0 {
-		return
-	}
+	// if rand.Intn(5) != 0 {
+	// 	return
+	// }
 	go analyzeAndReact(s, m)
 }
 
@@ -82,6 +81,7 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 	emotion := strings.ToLower(strings.TrimSpace(resp.Choices[0].Message.Content))
 	emoji := emotionToEmoji(emotion)
 	if emoji == "" {
+		log.Println("Blank emoji")
 		return
 	}
 
