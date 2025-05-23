@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -67,6 +66,7 @@ func main() {
 	})
 
 	dg.AddHandler(messageHandler)
+	dg.AddHandler(analyzeIntentHandler)
 
 	dg.AddHandler(commandHandler)
 	dg.AddHandler(weatherHandler)
@@ -93,29 +93,4 @@ func main() {
 
 	//fmt.Println("MoodBot is running. Press CTRL-C to exit.")
 	select {}
-}
-
-func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if m.Author.Bot {
-		return
-	}
-	if !botEnabled {
-		return
-	}
-
-	if !allowedChannels[m.ChannelID] {
-		return
-	}
-
-	msg := strings.ToLower(m.Content)
-	for keyword, emoji := range moodMap {
-		if strings.Contains(msg, keyword) {
-			_ = s.MessageReactionAdd(m.ChannelID, m.ID, emoji)
-			break
-		}
-	}
-
-	if strings.HasPrefix(msg, "/moodbot") {
-		s.ChannelMessageSend(m.ChannelID, "Hey! I'm MoodBot")
-	}
 }
