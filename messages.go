@@ -70,7 +70,7 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Messages: []openai.ChatCompletionMessage{
 				{Role: "user", Content: prompt},
 			},
-			MaxTokens: 1,
+			MaxTokens: 5,
 		},
 	)
 	if err != nil {
