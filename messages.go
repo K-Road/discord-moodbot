@@ -61,8 +61,8 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 		//log.Fatal("OPENAI_API_KEY not found")
 	}
 
-	prompt := fmt.Sprintf(`What is the emotion of this message? Respond with one word (e.g., happy, sad, angry, excited, confused, disappointed, etc). Message: %s"`, m.Content)
-
+	//prompt := fmt.Sprintf(`What is the emotion of this message? Respond with one word (e.g., happy, sad, angry, excited, confused, disappointed, etc). Message: %s"`, m.Content)
+	prompt := fmt.Sprintf(`Given the following message, reply with a single emoji that best represents the emotion or tone of the message. Do not include any text besides the emoji. Message: "%s"`, m.Content)
 	resp, err := openai.NewClient(key).CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
@@ -79,7 +79,20 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	emotion := strings.ToLower(strings.TrimSpace(resp.Choices[0].Message.Content))
-	emoji := emotionToEmoji(emotion)
+	//emoji := emotionToEmoji(emotion)
+	emoji := emotion
+
+	if isProbabyEmoji(emoji) {
+
+		//}
+		//if !strings.HasPrefix(emoji, ":") && emoji != "" {
+		err = s.MessageReactionAdd(m.ChannelID, m.ID, emoji)
+		if err != nil {
+			log.Println("Failed to add reaction:", err)
+		}
+	} else {
+		log.Println("Invalid of blank emoji:", err)
+	}
 
 	log.Println("Detected emotion:", emotion)
 	if emoji == "" {
@@ -87,31 +100,31 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
-	err = s.MessageReactionAdd(m.ChannelID, m.ID, emoji)
-	if err != nil {
-		log.Println("Failed to add emoji reactions:", err)
-	}
+	// err = s.MessageReactionAdd(m.ChannelID, m.ID, emoji)
+	// if err != nil {
+	// 	log.Println("Failed to add emoji reactions:", err)
+	// }
 }
 
-func emotionToEmoji(emotion string) string {
-	switch emotion {
-	case "angry", "mad", "annoyed", "furious":
-		return "😠"
-	case "happy", "joy", "joyful", "pleased", "delighted":
-		return "😄"
-	case "sad", "unhappy", "down", "depressed":
-		return "😢"
-	case "confused", "unsure":
-		return "😕"
-	case "excited", "thrilled":
-		return "🤩"
-	case "frustrated", "grumpy":
-		return "💥"
-	case "love", "loving":
-		return "❤️"
-	case "neutral", "okay", "fine":
-		return "😐"
-	default:
-		return ""
-	}
-}
+// func emotionToEmoji(emotion string) string {
+// 	switch emotion {
+// 	case "angry", "mad", "annoyed", "furious":
+// 		return "😠"
+// 	case "happy", "joy", "joyful", "pleased", "delighted":
+// 		return "😄"
+// 	case "sad", "unhappy", "down", "depressed":
+// 		return "😢"
+// 	case "confused", "unsure":
+// 		return "😕"
+// 	case "excited", "thrilled":
+// 		return "🤩"
+// 	case "frustrated", "grumpy":
+// 		return "💥"
+// 	case "love", "loving":
+// 		return "❤️"
+// 	case "neutral", "okay", "fine":
+// 		return "😐"
+// 	default:
+// 		return ""
+// 	}
+// }
