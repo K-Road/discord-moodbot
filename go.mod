@@ -4,6 +4,7 @@ go 1.22.4
 
 require (
 	github.com/bwmarrin/discordgo v0.28.1
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sashabaranov/go-openai v1.39.1
 )
 

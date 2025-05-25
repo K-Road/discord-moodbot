@@ -8,8 +8,32 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/patrickmn/go-cache"
 	"github.com/sashabaranov/go-openai"
 )
+
+type MessageHandlerFunc func(s *discordgo.Session, m *discordgo.MessageCreate)
+
+func WrapWithCache(handler MessageHandlerFunc) MessageHandlerFunc {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		if m.Author.Bot {
+			return
+		}
+		if !botEnabled {
+			return
+		}
+		if !allowedChannels[m.ChannelID] {
+			return
+		}
+		key := fmt.Sprintf("%s:%s", m.Author.ID, strings.ToLower(strings.TrimSpace(m.Content)))
+
+		if _, found := messageCache.Get(key); found {
+			return //Found in cache
+		}
+		messageCache.Set(key, true, cache.DefaultExpiration)
+		handler(s, m)
+	}
+}
 
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot {
@@ -77,43 +101,16 @@ func analyzeIntentHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	//TODO Randomize react rate
 	// if rand.Intn(5) != 0 {
 	// 	return
 	// }
+
 	prompt := fmt.Sprintf(`Given the following message, reply with a single emoji that best represents the emotion or tone of the message. Do not include any text besides the emoji. Message: "%s"`, m.Content)
 	go analyzeAndReact(s, m, prompt)
 }
 
 func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate, prompt string) {
-	// key := os.Getenv("OPENAI_API_KEY")
-	// if key == "" {
-	// 	log.Println("Missing OPENAI_API_KEY in environment")
-	// 	return //"", fmt.Errorf("can't fetch mood, OpenAI key is missing. Blame the dev")
-	// 	//log.Fatal("OPENAI_API_KEY not found")
-	// }
-
-	//prompt := fmt.Sprintf(`What is the emotion of this message? Respond with one word (e.g., happy, sad, angry, excited, confused, disappointed, etc). Message: %s"`, m.Content)
-
-	// resp, err := openai.NewClient(key).CreateChatCompletion(
-	// 	context.Background(),
-	// 	openai.ChatCompletionRequest{
-	// 		Model: openai.GPT3Dot5Turbo,
-	// 		Messages: []openai.ChatCompletionMessage{
-	// 			{Role: "user", Content: prompt},
-	// 		},
-	// 		MaxTokens: 5,
-	// 	},
-	// )
-	// if err != nil {
-	// 	log.Println("OpenAI call failed:", err)
-	// 	return
-	// }
-
-	// reply := strings.ToLower(strings.TrimSpace(resp.Choices[0].Message.Content))
-	// //emoji := emotionToEmoji(emotion)
-	// emoji := reply
-
-	// if isProbabyEmoji(emoji) {
 	go func() {
 		emoji, err := analyzeMessageForEmoji(prompt)
 		if err != nil {
@@ -135,10 +132,6 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate, prompt st
 		}
 	}()
 
-	// err = s.MessageReactionAdd(m.ChannelID, m.ID, emoji)
-	// if err != nil {
-	// 	log.Println("Failed to add emoji reactions:", err)
-	// }
 }
 
 // func emotionToEmoji(emotion string) string {

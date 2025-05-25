@@ -5,8 +5,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/patrickmn/go-cache"
 )
 
 var moodMap = map[string]string{
@@ -27,6 +29,11 @@ var allowedChannels = map[string]bool{
 }
 
 var botEnabled = true
+var messageCache *cache.Cache
+
+func init() {
+	messageCache = cache.New(10*time.Minute, 30*time.Minute)
+}
 
 func main() {
 	//Load .env
@@ -66,7 +73,8 @@ func main() {
 	})
 
 	dg.AddHandler(messageHandler)
-	dg.AddHandler(analyzeIntentHandler)
+	//dg.AddHandler(analyzeIntentHandler)
+	dg.AddHandler(WrapWithCache(analyzeIntentHandler))
 
 	dg.AddHandler(commandHandler)
 	dg.AddHandler(weatherHandler)
