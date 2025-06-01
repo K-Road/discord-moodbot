@@ -78,12 +78,12 @@ func main() {
 	// 	log.Println("🔔 Raw message received:", m.Content)
 	// })
 
-	//dg.AddHandler(messageHandler)
+	dg.AddHandler(messageHandler)
 	//dg.AddHandler(analyzeIntentHandler)
-	//dg.AddHandler(WrapWithCache(analyzeIntentHandler))
-	dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
-		WrapWithCache(analyzeIntentHandler)(s, m)
-	})
+	dg.AddHandler(CacheHandler(analyzeIntentHandler))
+	// dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+	// 	WrapWithCache(analyzeIntentHandler)(s, m)
+	// })
 
 	dg.AddHandler(commandHandler)
 	dg.AddHandler(weatherHandler)

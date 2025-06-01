@@ -39,6 +39,7 @@ func WrapWithCache(handler MessageHandlerFunc) MessageHandlerFunc {
 	}
 }
 
+// for keyword reactions
 func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	if m.Author.Bot {
 		return
@@ -137,26 +138,3 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate, prompt st
 	}()
 
 }
-
-// func emotionToEmoji(emotion string) string {
-// 	switch emotion {
-// 	case "angry", "mad", "annoyed", "furious":
-// 		return "😠"
-// 	case "happy", "joy", "joyful", "pleased", "delighted":
-// 		return "😄"
-// 	case "sad", "unhappy", "down", "depressed":
-// 		return "😢"
-// 	case "confused", "unsure":
-// 		return "😕"
-// 	case "excited", "thrilled":
-// 		return "🤩"
-// 	case "frustrated", "grumpy":
-// 		return "💥"
-// 	case "love", "loving":
-// 		return "❤️"
-// 	case "neutral", "okay", "fine":
-// 		return "😐"
-// 	default:
-// 		return ""
-// 	}
-// }

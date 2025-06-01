@@ -3,6 +3,8 @@ package main
 import (
 	"unicode"
 	"unicode/utf8"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 var emojiRanges = []*unicode.RangeTable{
@@ -35,4 +37,10 @@ func isProbabyEmoji(s string) bool {
 		}
 	}
 	return false
+}
+
+func CacheHandler(handler MessageHandlerFunc) interface{} {
+	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		WrapWithCache(handler)(s, m)
+	}
 }
