@@ -16,6 +16,7 @@ type MessageHandlerFunc func(s *discordgo.Session, m *discordgo.MessageCreate)
 
 func WrapWithCache(handler MessageHandlerFunc) MessageHandlerFunc {
 	return func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		log.Println("DEBUG WrapWithCatch trigged. Message:", m.Content)
 		if m.Author.Bot {
 			return
 		}
