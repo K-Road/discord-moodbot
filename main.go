@@ -59,6 +59,8 @@ func main() {
 	}
 	dg.ShouldReconnectOnError = true
 
+	dg.Identify.Intents = discordgo.IntentsGuildMessages | discordgo.IntentsGuilds | discordgo.IntentsMessageContent
+
 	dg.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Print("✅ Bot is ready and connected to Discord.")
 	})
