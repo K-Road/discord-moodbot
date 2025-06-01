@@ -78,7 +78,7 @@ func main() {
 		log.Println("🔔 Raw message received:", m.Content)
 	})
 
-	dg.AddHandler(messageHandler)
+	//dg.AddHandler(messageHandler)
 	//dg.AddHandler(analyzeIntentHandler)
 	dg.AddHandler(WrapWithCache(analyzeIntentHandler))
 
