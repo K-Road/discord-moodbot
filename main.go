@@ -73,6 +73,10 @@ func main() {
 	dg.AddHandler(func(s *discordgo.Session, evt *discordgo.Resumed) {
 		log.Printf("🔁 Bot resumed session with Discord. Trace: %v", evt.Trace)
 	})
+	//DEBUG
+	dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		log.Println("🔔 Raw message received:", m.Content)
+	})
 
 	dg.AddHandler(messageHandler)
 	//dg.AddHandler(analyzeIntentHandler)
