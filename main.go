@@ -80,7 +80,10 @@ func main() {
 
 	//dg.AddHandler(messageHandler)
 	//dg.AddHandler(analyzeIntentHandler)
-	dg.AddHandler(WrapWithCache(analyzeIntentHandler))
+	//dg.AddHandler(WrapWithCache(analyzeIntentHandler))
+	dg.AddHandler(func(s *discordgo.Session, m *discordgo.MessageCreate) {
+		WrapWithCache(analyzeIntentHandler)(s, m)
+	})
 
 	dg.AddHandler(commandHandler)
 	dg.AddHandler(weatherHandler)
