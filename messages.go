@@ -25,11 +25,14 @@ func WrapWithCache(handler MessageHandlerFunc) MessageHandlerFunc {
 		if !allowedChannels[m.ChannelID] {
 			return
 		}
-		key := fmt.Sprintf("%s:%s", m.Author.ID, strings.ToLower(strings.TrimSpace(m.Content)))
+		normalized := strings.Join(strings.Fields(m.Content), " ")
+		key := fmt.Sprintf("%s:%s", m.Author.ID, strings.ToLower(normalized))
 
 		if _, found := messageCache.Get(key); found {
+			log.Println("Message in cache:", key)
 			return //Found in cache
 		}
+		log.Println("Processing message:", key)
 		messageCache.Set(key, true, cache.DefaultExpiration)
 		handler(s, m)
 	}
