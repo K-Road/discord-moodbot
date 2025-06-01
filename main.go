@@ -73,8 +73,8 @@ func main() {
 	})
 
 	dg.AddHandler(messageHandler)
-	dg.AddHandler(analyzeIntentHandler)
-	//dg.AddHandler(WrapWithCache(analyzeIntentHandler))
+	//dg.AddHandler(analyzeIntentHandler)
+	dg.AddHandler(WrapWithCache(analyzeIntentHandler))
 
 	dg.AddHandler(commandHandler)
 	dg.AddHandler(weatherHandler)
