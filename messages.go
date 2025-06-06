@@ -129,7 +129,7 @@ func analyzeAndReact(s *discordgo.Session, m *discordgo.MessageCreate, prompt st
 			log.Println("Invalid of blank emoji:", err)
 		}
 
-		//DEBUG
+		//TODO check why blank
 		log.Println("Detected reply:", emoji)
 		if emoji == "" {
 			log.Println("Blank reply")
